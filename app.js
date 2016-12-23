@@ -63,10 +63,7 @@ app.get('/', function(req, res) {
 // Retrieve a list of bars for the area requested
 app.post('/', function(req, res) {
     var yelp = new Yelp({
-        consumer_key: "w9MwQY2uR0XyBOzORutqMg",
-        consumer_secret: "iJve8e5N0CQDSPVBGYhq3TJRGwk",
-        token: "m05be2EaLzuhrF53aDa9ZPlb4TaQGYg9",
-        token_secret: "gm8yyJPPrgr298QYjQkrhsdMhz0"
+        
     });
 
     // Query to Yelp API
