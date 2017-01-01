@@ -33,14 +33,15 @@ var Search = React.createClass({
             data: data
         }).done(function (data) {
             data = JSON.parse(data);
+            console.log(data);
             var resultList = [];
 
-            data.businesses.forEach(function (item) {
-                resultList.push(React.createElement(Result, { rating: item.rating_img_url_large, name: item.name,
+            data.forEach(function (item) {
+                resultList.push(React.createElement(ResultHolder, { rating: item.rating_img_url_large,
                     url: item.url, phone: item.display_phone,
                     snippet: item.snippet_text, image: item.image_url,
-                    review_count: item.review_count, key: item.id,
-                    closed: item.is_closed }));
+                    key: item.id, id: item.id, name: item.name,
+                    going: item.going }));
             });
 
             self.setState({
@@ -82,6 +83,24 @@ var Search = React.createClass({
     }
 });
 
+// Component that holds the people going and the results
+var ResultHolder = React.createClass({
+    displayName: "ResultHolder",
+
+    render: function render() {
+        return React.createElement(
+            "div",
+            null,
+            React.createElement(Going, { going: this.props.going }),
+            React.createElement(Result, { rating: this.props.rating,
+                name: this.props.name,
+                url: this.props.url, phone: this.props.phone,
+                snippet: this.props.snippet,
+                image: this.props.image, id: this.props.id })
+        );
+    }
+});
+
 // Component to hold a result from the search
 var Result = React.createClass({
     displayName: "Result",
@@ -93,7 +112,7 @@ var Result = React.createClass({
             React.createElement(
                 "a",
                 { href: this.props.url, target: "_blank" },
-                React.createElement("img", { src: this.props.image, className: "img-responsive biz-img" }),
+                React.createElement("img", { src: this.props.image, className: "biz-img" }),
                 React.createElement(
                     "h1",
                     null,
@@ -106,17 +125,25 @@ var Result = React.createClass({
                 ),
                 React.createElement(
                     "h4",
-                    { className: "phone" },
-                    this.props.phone
-                ),
-                React.createElement(
-                    "h4",
                     null,
-                    this.props.review_count,
-                    " Reviews"
+                    this.props.phone
                 ),
                 React.createElement("img", { src: this.props.rating, className: "img-responsive rating" })
             )
+        );
+    }
+});
+
+// Component that holds how many people are going to a location
+var Going = React.createClass({
+    displayName: "Going",
+
+    render: function render() {
+        return React.createElement(
+            "div",
+            { className: "going" },
+            this.props.going,
+            " Going"
         );
     }
 });

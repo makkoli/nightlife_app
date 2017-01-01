@@ -1,14 +1,27 @@
 include mixins/head.pug
 
 +head
-header
-    div(class="title")
-        h1 Nightlife Coordination
-        h3 See where people are meeting and RSVP ahead of time.
+body
+    header
+        if logged
+            div(class="twitter")
+                img(src="/images/twitter-image.jpg" alt="Twitter")
+                p Welcome #{user}
+        else
+            a(href="/auth/twitter")
+                div(class="twitter")
+                    img(src="/images/twitter-image.jpg" alt="Twitter")
+                    p Sign in with Twitter
+        div(class="title")
+            h1 Nightlife Coordination
+            h3 See where people are meeting and RSVP ahead of time.
 
-div(id="search")
+    div(id="search")
+    div(id="destinations")
+    div(class="footer") Powered by Yelp
 
-script(src="https://unpkg.com/react@15/dist/react.js")
-script(src="https://unpkg.com/react-dom@15/dist/react-dom.js")
-script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js")
-script(src="/js/search.js")
+    script(src="https://unpkg.com/react@15/dist/react.js")
+    script(src="https://unpkg.com/react-dom@15/dist/react-dom.js")
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js")
+    script(src="/js/search.js")
+    script(src="/js/destinations.js")
