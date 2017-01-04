@@ -4,14 +4,10 @@
 var Destinations = React.createClass({
     displayName: "Destinations",
 
-    getInitialProps: function getInitialProps() {
-        return {
-            user: $("#destinations").attr("data-user")
-        };
-    },
+    componentDidMount: function componentDidMount() {},
 
     render: function render() {
-        console.log($("#destinations").attr("data-user"));
+        console.log(document.querySelector("#destinations").getAttribute("data-user"));
         // Render nothing if no user
         if (this.props.user === "") {
             return;

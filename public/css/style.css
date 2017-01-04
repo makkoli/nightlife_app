@@ -43,6 +43,28 @@ header {
     margin: 0;
     padding: 0; }
 
+.user-locations {
+  width: auto;
+  height: auto;
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  background-color: #32CCFE;
+  border-top-left-radius: 15px;
+  padding: 5px 20px 5px 20px;
+  text-align: center;
+  font-size: large; }
+  .user-locations p {
+    display: inline;
+    margin: 0;
+    margin-left: 5px;
+    padding: 0; }
+
+.user-locations:hover {
+  background: #fff;
+  color: #000;
+  cursor: pointer; }
+
 h1, h3 {
   font-family: "Montserrat", sans-serif;
   color: white; }
@@ -58,6 +80,8 @@ form {
   width: 50%;
   height: auto;
   margin: 0 auto; }
+  .resultList a {
+    color: black; }
   .resultList .going {
     width: 15%;
     height: auto;
@@ -69,6 +93,10 @@ form {
     border-top-right-radius: 15px;
     padding-top: 5px;
     padding-bottom: 5px; }
+  .resultList .going-login:hover {
+    color: black;
+    background-color: #fff;
+    cursor: pointer; }
   .resultList .result {
     width: 100%;
     height: auto;
@@ -87,8 +115,6 @@ form {
     .resultList .result p {
       width: 80%;
       display: inline-block; }
-    .resultList .result a {
-      color: black; }
     .resultList .result .biz-img {
       float: left; }
     .resultList .result .rating {
@@ -96,28 +122,6 @@ form {
     .resultList .result i {
       font-size: large;
       font-size: normal; }
-
-.destinations {
-  position: fixed;
-  height: auto;
-  width: 20%;
-  bottom: 0;
-  right: 0;
-  border-top: 5px solid white;
-  border-left: 5px solid white; }
-  .destinations .header {
-    background-color: #337AB7; }
-  .destinations .content {
-    padding-left: 10%;
-    text-align: left;
-    background: #eaeaea;
-    color: black; }
-    .destinations .content ul {
-      margin: 0;
-      padding: 0; }
-      .destinations .content ul li {
-        margin: 0;
-        padding: 0; }
 
 .footer {
   margin-top: 20px;

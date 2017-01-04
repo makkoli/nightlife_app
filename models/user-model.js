@@ -11,6 +11,10 @@ var UserSchema = new Schema({
     username: {
         type: String,
         required: true
+    },
+    going_to: {
+        type: [String],
+        default: []
     }},
     {
         collection: 'users'

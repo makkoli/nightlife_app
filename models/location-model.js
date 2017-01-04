@@ -14,9 +14,9 @@ var LocationSchema = new Schema({
         min: 0,
         default: 0
     },
-    users_going: {
-        type: [String],
-        default: []
+    url: {
+        type: String,
+        required: true
     }},
     {
         collection: 'locations'

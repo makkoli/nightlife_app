@@ -7,8 +7,8 @@ var express = require('express'),
     mongoose = require('mongoose'),
     User = require('./models/user-model'),
     Location = require('./models/location-model'),
-    Env = require('./env/env')
-    Yelp = require('yelp')
+    Env = require('./env/env'),
+    Yelp = require('yelp'),
     app = express();
 
 var dbConnStr = 'mongodb://localhost:27017/nightlife';
@@ -76,6 +76,16 @@ app.get('/', getLoginSession, function(req, res) {
     });
 });
 
+app.get('/get_user_info', [getLoginSession, getUserLocations], function(req, res) {
+    var data = {
+        "user": res.locals.user,
+        "userLocations": res.locals.userLocations
+    };
+
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end(JSON.stringify(data));
+});
+
 // Login with twitter
 app.get('/auth/twitter', passport.authenticate('twitter'));
 
@@ -89,7 +99,7 @@ app.get('/auth/twitter/callback',
 
 /*************************** Post Page Requests *******************************/
 // Retrieve a list of bars for the area requested
-app.post('/', [getYelpLocations, getNumGoing], function(req, res) {
+app.post('/search', [getYelpLocations, getNumGoing], function(req, res) {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end(JSON.stringify(res.locals.businesses));
 });
@@ -109,7 +119,7 @@ function getLoginSession(req, res, next) {
 // Get 20 locations in the area using Yelp
 function getYelpLocations(req, res, next) {
     // Set last search
-    req.session.lastSearch = req.body.searchTerm;
+    req.session.lastSearch = req.query.term;
 
     var yelp = new Yelp({
         consumer_key: Env.env.yelpConsumerKey,
@@ -121,7 +131,7 @@ function getYelpLocations(req, res, next) {
     // Query to Yelp API
     yelp.search({
         term: 'bars',
-        location: req.body.searchTerm,
+        location: req.query.term,
         limit: 20,
         radius_filter: 10000
     })
@@ -175,6 +185,25 @@ function getNumGoing(req, res, next) {
         res.locals.businesses = businesses;
         next();
     });
+};
+
+// Gets all the location destinations for a user
+function getUserLocations(req, res, next) {
+    // If the user is logged in, retrieve destinations
+    if (!!res.locals.user) {
+        var query = { "username": res.locals.user };
+
+        User.findOne(query, function(err, docs) {
+            if (err) res.render(500);
+
+            res.locals.userLocations = docs.going_to;
+            next();
+        });
+    }
+    // Else, just return the empty user string
+    else {
+        next();
+    }
 };
 
 /******************************************************************************/

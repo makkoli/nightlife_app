@@ -5,7 +5,7 @@ var Destinations = React.createClass({
     },
 
     render: function() {
-        console.log($("#destinations").attr("data-user"));
+        console.log(document.querySelector("#destinations").getAttribute("data-user"));
         // Render nothing if no user
         if (this.props.user === "") {
             return;
