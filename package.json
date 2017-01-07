@@ -29,9 +29,8 @@
     "mongoose-findorcreate": "^0.1.2",
     "passport": "^0.3.2",
     "passport-twitter": "^1.0.4",
+    "promise": "^7.1.1",
     "pug": "^2.0.0-beta6",
-    "react": "^15.4.1",
-    "react-dom": "^15.4.1",
     "yelp": "^1.0.2"
   },
   "devDependencies": {

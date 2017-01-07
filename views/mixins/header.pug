@@ -1,0 +1,19 @@
+//- Mixin for the header at the top of the page
+
+mixin header(logged, user)
+    header
+        if logged
+            div(class="twitter")
+                img(src="/images/twitter-image.jpg" alt="Twitter")
+                p Welcome #{user}
+            a(href=user + "/destinations" class="user-locations")
+                span(class="glyphicon glyphicon-map-marker" area-hidden="true")
+                p My Destinations
+        else
+            a(href="/auth/twitter")
+                div(class="twitter")
+                    img(src="/images/twitter-image.jpg" alt="Twitter")
+                    p Sign in with Twitter
+        div(class="title")
+            h1 Nightlife Coordination
+            h3 See where people are meeting and RSVP ahead of time.

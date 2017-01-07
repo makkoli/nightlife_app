@@ -53,7 +53,9 @@ header {
   border-top-left-radius: 15px;
   padding: 5px 20px 5px 20px;
   text-align: center;
-  font-size: large; }
+  font-size: large;
+  color: white;
+  text-decoration: none; }
   .user-locations p {
     display: inline;
     margin: 0;
@@ -126,5 +128,25 @@ form {
 .footer {
   margin-top: 20px;
   margin-bottom: 20px; }
+
+.destinations {
+  margin: 0 auto;
+  width: 50%;
+  height: auto;
+  color: white;
+  border: 5px solid white; }
+  .destinations .header {
+    height: auto;
+    font-size: x-large;
+    border-bottom: 5px solid white;
+    text-align: center;
+    padding-top: 5px;
+    padding-bottom: 5px; }
+  .destinations .content {
+    text-align: left;
+    height: auto;
+    padding: 5px; }
+    .destinations .content ul {
+      list-style-type: square; }
 
 /*# sourceMappingURL=style.css.map */

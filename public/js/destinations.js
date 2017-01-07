@@ -1,42 +1,81 @@
 "use strict";
 
-// User destinations
+// User destinations state component
 var Destinations = React.createClass({
     displayName: "Destinations",
 
-    componentDidMount: function componentDidMount() {},
+    getInitialState: function getInitialState() {
+        return {
+            user: "",
+            userLocations: []
+        };
+    },
+
+    componentDidMount: function componentDidMount() {
+        var self = this;
+
+        axios.get('/get_user_info').then(function (response) {
+            console.log(response);
+            self.setState({
+                user: response.data.user,
+                userLocations: response.data.userLocations
+            });
+        }).catch(function (error) {
+            console.log(error);
+            self.setState({
+                user: "",
+                userLocations: []
+            });
+        });
+    },
 
     render: function render() {
-        console.log(document.querySelector("#destinations").getAttribute("data-user"));
-        // Render nothing if no user
-        if (this.props.user === "") {
-            return;
-        }
-        // Else, render the user"s destinations
-        else {
-                return React.createElement(
-                    "div",
-                    { className: "destinations" },
-                    React.createElement(
-                        "div",
-                        { className: "header" },
-                        "test"
-                    ),
-                    React.createElement(
-                        "div",
-                        { className: "content" },
-                        React.createElement(
-                            "ul",
+        return React.createElement(DestinationContainer, { locations: this.state.userLocations });
+    }
+});
+
+var DestinationContainer = React.createClass({
+    displayName: "DestinationContainer",
+
+    render: function render() {
+        return React.createElement(
+            "div",
+            { className: "destinations" },
+            React.createElement(
+                "div",
+                { className: "header" },
+                "Destinations For Tonight"
+            ),
+            React.createElement(
+                "div",
+                { className: "content" },
+                React.createElement(
+                    "ul",
+                    null,
+                    this.props.locations.forEach(function (location) {
+                        console.log(location);
+                        return React.createElement(
+                            "li",
                             null,
-                            React.createElement(
-                                "li",
-                                null,
-                                "test"
-                            )
-                        )
-                    )
-                );
-            }
+                            React.createElement(Destination, { location: location })
+                        );
+                    })
+                )
+            )
+        );
+    }
+});
+
+var Destination = React.createClass({
+    displayName: "Destination",
+
+    render: function render() {
+        console.log(this.props.location);
+        return React.createElement(
+            "div",
+            null,
+            this.props.location
+        );
     }
 });
 

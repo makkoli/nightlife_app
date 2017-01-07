@@ -8,6 +8,10 @@ var LocationSchema = new Schema({
         required: true,
         index: {unique: true}
     },
+    name: {
+        type: String,
+        required: true
+    },
     going: {
         type: Number,
         required: true,

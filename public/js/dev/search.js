@@ -6,28 +6,9 @@ var Search = React.createClass({
             searchTerm: "",
             display: "none",
             user: "",
-            results: []
+            results: [],
+            userLocations: []
         };
-    },
-
-    // Once component mounts, get user info
-    componentDidMount: function() {
-        var self = this;
-
-        Promise.resolve(axios.get('/get_user_info'))
-            .then(function(response) {
-                console.log(response.data);
-                self.setState({
-                    user: response.data.user,
-                    userLocations: response.data.userLocations
-                });
-            })
-            .catch(function(error) {
-                console.log(error);
-                self.setState({
-                    user: ""
-                });
-            });
     },
 
     // submit a search using ajax
@@ -40,8 +21,9 @@ var Search = React.createClass({
             display: "inline-block"
         });
 
-        Promise.resolve(axios.post('/search/?term=' + this.state.searchTerm, { }))
+        axios.post('/search/?term=' + this.state.searchTerm, { })
             .then(function(response) {
+                console.log(response);
                 self.setState({
                     display: "none",
                     results: response.data
