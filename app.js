@@ -7,9 +7,10 @@ var express = require('express'),
     mongoose = require('mongoose'),
     User = require('./models/user-model'),
     Env = require('./env/env'),
-    site = require('./site'),
-    search = require('./search'),
-    destinations = require('./destinations'),
+    site = require('./routes/site'),
+    search = require('./routes/search'),
+    destinations = require('./routes/destinations'),
+    addUser = require('./routes/add_user'),
     middleware = require('./middleware'),
     app = express();
 
@@ -85,6 +86,9 @@ app.get('/auth/twitter/callback',
 
 // Perform a search for bars
 app.post('/search', middleware.getLoginSession, search.getSearchInfo);
+
+// Add a user to a location
+app.post('/add_user', middleware.getLoginSession, addUser.add);
 
 
 var server = app.listen(8000, function() {

@@ -6,8 +6,7 @@ var Search = React.createClass({
             searchTerm: "",
             display: "none",
             user: "",
-            results: [],
-            userLocations: []
+            results: []
         };
     },
 
@@ -26,7 +25,8 @@ var Search = React.createClass({
                 console.log(response);
                 self.setState({
                     display: "none",
-                    results: response.data
+                    results: response.data.slice(0, response.data.length - 1),
+                    user: response.data[response.data.length - 1]
                 });
             })
             .catch(function(error) {
@@ -93,7 +93,8 @@ var ResultListContainer = React.createClass({
                         url={item.url} phone={item.display_phone}
                         snippet={item.snippet_text} image={item.image_url}
                         key={item.id} id={item.id} name={item.name}
-                        going={item.going} user={self.props.user} />
+                        going={item.going} user={self.props.user}
+                        userGoing={item.userGoing} />
             );
         });
 
@@ -111,7 +112,8 @@ var ResultContainer = React.createClass({
     render: function() {
         return (
             <div>
-                <Going going={this.props.going} user={this.props.user} />
+                <Going going={this.props.going} user={this.props.user}
+                    userGoing={this.props.userGoing} id={this.props.id} />
                 <a href={this.props.url} target="_blank">
                     <Result rating={this.props.rating}
                             name={this.props.name}
@@ -144,27 +146,64 @@ var Result = React.createClass({
 // Component that holds how many people are going to a location
 var Going = React.createClass({
     getInitialState: function() {
-        return { going: this.props.going + " Going" };
+        return {
+            going: this.props.going + " Going",
+            numGoing: this.props.going,
+            userGoing: this.props.userGoing
+        };
     },
 
-    goingMouseOver: function(event) {
-        this.setState({ going: "I'm Going" });
+    goingMouseOver: function(goingStr, event) {
+        this.setState({ going: goingStr });
     },
 
     goingMouseOut: function(event) {
         this.setState({ going: this.props.going + " Going" });
     },
 
+    goingOnClick: function(event) {
+        var self = this;
+
+        axios.post('/add_user/?id=' + this.props.id + '?name=' +
+                    this.props.name + '?url=' + this.props.url, { })
+            .then(function(response) {
+                self.setState({
+                    going: Number(self.state.numGoing++) + " Going",
+                    numGoing: self.state.numGoing++,
+                    userGoing: true
+                });
+            })
+            .catch(function(error) {
+                console.log(error);
+            });
+    },
+
     render: function() {
+        // If the user is logged in
         if (!!this.props.user) {
-            return (
-                <div className="going going-login"
-                    onMouseOver={this.goingMouseOver}
-                    onMouseOut={this.goingMouseOut}>
-                    { this.state.going }
-                </div>
-            );
+            // If the user is going to this location
+            if (this.state.userGoing) {
+                return (
+                    <div className="going user-login"
+                        onMouseOver={this.goingMouseOver.bind(null, "You\'re Added")}
+                        onMouseOut={this.goingMouseOut}>
+                        {this.state.going}
+                    </div>
+                );
+            }
+            // Else, the user is not going to this location
+            else {
+                return (
+                    <div className="going user-login"
+                        onMouseOver={this.goingMouseOver.bind(null, "Add Me")}
+                        onMouseOut={this.goingMouseOut}
+                        onClick={this.goingOnClick.bind(null, this.props.id)}>
+                        { this.state.going }
+                    </div>
+                );
+            }
         }
+        // Else, the user is not logged in
         else {
             return (
                 <div className="going">

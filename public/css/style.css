@@ -85,7 +85,7 @@ form {
   .resultList a {
     color: black; }
   .resultList .going {
-    width: 15%;
+    width: 20%;
     height: auto;
     margin-left: 5%;
     border-top: 5px solid white;
@@ -95,7 +95,7 @@ form {
     border-top-right-radius: 15px;
     padding-top: 5px;
     padding-bottom: 5px; }
-  .resultList .going-login:hover {
+  .resultList .user-login:hover {
     color: black;
     background-color: #fff;
     cursor: pointer; }

@@ -10,8 +10,7 @@ var Search = React.createClass({
             searchTerm: "",
             display: "none",
             user: "",
-            results: [],
-            userLocations: []
+            results: []
         };
     },
 
@@ -29,7 +28,8 @@ var Search = React.createClass({
             console.log(response);
             self.setState({
                 display: "none",
-                results: response.data
+                results: response.data.slice(0, response.data.length - 1),
+                user: response.data[response.data.length - 1]
             });
         }).catch(function (error) {
             var errorNode = document.createElement('p');
@@ -98,7 +98,8 @@ var ResultListContainer = React.createClass({
                 url: item.url, phone: item.display_phone,
                 snippet: item.snippet_text, image: item.image_url,
                 key: item.id, id: item.id, name: item.name,
-                going: item.going, user: self.props.user }));
+                going: item.going, user: self.props.user,
+                userGoing: item.userGoing }));
         });
 
         return React.createElement(
@@ -118,7 +119,8 @@ var ResultContainer = React.createClass({
         return React.createElement(
             "div",
             null,
-            React.createElement(Going, { going: this.props.going, user: this.props.user }),
+            React.createElement(Going, { going: this.props.going, user: this.props.user,
+                userGoing: this.props.userGoing, id: this.props.id }),
             React.createElement(
                 "a",
                 { href: this.props.url, target: "_blank" },
@@ -168,33 +170,68 @@ var Going = React.createClass({
     displayName: "Going",
 
     getInitialState: function getInitialState() {
-        return { going: this.props.going + " Going" };
+        return {
+            going: this.props.going + " Going",
+            numGoing: this.props.going,
+            userGoing: this.props.userGoing
+        };
     },
 
-    goingMouseOver: function goingMouseOver(event) {
-        this.setState({ going: "I'm Going" });
+    goingMouseOver: function goingMouseOver(goingStr, event) {
+        this.setState({ going: goingStr });
     },
 
     goingMouseOut: function goingMouseOut(event) {
         this.setState({ going: this.props.going + " Going" });
     },
 
+    goingOnClick: function goingOnClick(event) {
+        var self = this;
+
+        axios.post('/add_user/?id=' + this.props.id + '?name=' + this.props.name + '?url=' + this.props.url, {}).then(function (response) {
+            self.setState({
+                going: Number(self.state.numGoing++) + " Going",
+                numGoing: self.state.numGoing++,
+                userGoing: true
+            });
+        }).catch(function (error) {
+            console.log(error);
+        });
+    },
+
     render: function render() {
+        // If the user is logged in
         if (!!this.props.user) {
-            return React.createElement(
-                "div",
-                { className: "going going-login",
-                    onMouseOver: this.goingMouseOver,
-                    onMouseOut: this.goingMouseOut },
-                this.state.going
-            );
-        } else {
-            return React.createElement(
-                "div",
-                { className: "going" },
-                this.state.going
-            );
+            // If the user is going to this location
+            if (this.state.userGoing) {
+                return React.createElement(
+                    "div",
+                    { className: "going user-login",
+                        onMouseOver: this.goingMouseOver.bind(null, "You\'re Added"),
+                        onMouseOut: this.goingMouseOut },
+                    this.state.going
+                );
+            }
+            // Else, the user is not going to this location
+            else {
+                    return React.createElement(
+                        "div",
+                        { className: "going user-login",
+                            onMouseOver: this.goingMouseOver.bind(null, "Add Me"),
+                            onMouseOut: this.goingMouseOut,
+                            onClick: this.goingOnClick.bind(null, this.props.id) },
+                        this.state.going
+                    );
+                }
         }
+        // Else, the user is not logged in
+        else {
+                return React.createElement(
+                    "div",
+                    { className: "going" },
+                    this.state.going
+                );
+            }
     }
 });
 
