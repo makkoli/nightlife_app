@@ -1,5 +1,7 @@
 "use strict";
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 // Search form container, handles state changes in the application
 var Search = React.createClass({
     displayName: "Search",
@@ -10,26 +12,49 @@ var Search = React.createClass({
             searchTerm: "",
             display: "none",
             user: "",
+            lastSearch: "",
             results: []
         };
+    },
+
+    // Initialize component once mounted
+    componentDidMount: function componentDidMount() {
+        var self = this;
+
+        axios.get('/initSearch').then(function (response) {
+            self.setState({
+                user: response.data.user
+            });
+
+            if (!!response.data.lastSearch) {
+                self.getSearch(response.data.lastSearch);
+            }
+        }).catch(function (error) {
+            console.log(error);
+            self.setState({
+                user: ""
+            });
+        });
     },
 
     // submit a search using ajax
     submit: function submit(event) {
         event.preventDefault();
+        this.getSearch(this.state.searchTerm);
+    },
 
+    // Sends a request to the server to get the locales
+    getSearch: function getSearch(searchTerm) {
         var self = this;
 
         this.setState({
             display: "inline-block"
         });
 
-        axios.post('/search/?term=' + this.state.searchTerm, {}).then(function (response) {
-            console.log(response);
+        axios.post('/search/?term=' + searchTerm, {}).then(function (response) {
             self.setState({
                 display: "none",
-                results: response.data.slice(0, response.data.length - 1),
-                user: response.data[response.data.length - 1]
+                results: response.data
             });
         }).catch(function (error) {
             var errorNode = document.createElement('p');
@@ -119,8 +144,10 @@ var ResultContainer = React.createClass({
         return React.createElement(
             "div",
             null,
-            React.createElement(Going, { going: this.props.going, user: this.props.user,
-                userGoing: this.props.userGoing, id: this.props.id }),
+            React.createElement(Going, _defineProperty({ going: this.props.going, user: this.props.user,
+                userGoing: this.props.userGoing, id: this.props.id,
+                name: this.props.name, url: this.props.url
+            }, "user", this.props.user)),
             React.createElement(
                 "a",
                 { href: this.props.url, target: "_blank" },
@@ -177,18 +204,21 @@ var Going = React.createClass({
         };
     },
 
+    // Change to indicate user can add or has been added to this locale
     goingMouseOver: function goingMouseOver(goingStr, event) {
         this.setState({ going: goingStr });
     },
 
+    // Revert back to normal once user mouses out
     goingMouseOut: function goingMouseOut(event) {
-        this.setState({ going: this.props.going + " Going" });
+        this.setState({ going: this.state.numGoing + " Going" });
     },
 
+    // Add a user to a locale
     goingOnClick: function goingOnClick(event) {
         var self = this;
 
-        axios.post('/add_user/?id=' + this.props.id + '?name=' + this.props.name + '?url=' + this.props.url, {}).then(function (response) {
+        axios.post('/add_user/?id=' + this.props.id + '&name=' + this.props.name + '&url=' + this.props.url, {}).then(function (response) {
             self.setState({
                 going: Number(self.state.numGoing++) + " Going",
                 numGoing: self.state.numGoing++,

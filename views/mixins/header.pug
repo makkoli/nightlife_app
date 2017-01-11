@@ -3,7 +3,7 @@
 mixin header(logged, user)
     header
         if logged
-            div(class="twitter")
+            a(href="/" class="twitter")
                 img(src="/images/twitter-image.jpg" alt="Twitter")
                 p Welcome #{user}
             a(href=user + "/destinations" class="user-locations")

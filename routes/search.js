@@ -7,11 +7,17 @@ var Env = require('../env/env'),
 // Retrieve a list of bars for the area requested
 // res parameter passes in logged and user values if they are logged in
 exports.getSearchInfo = function(req, res) {
-    // Set last search
-    req.session.lastSearch = req.query.term;
+    // Set last search if user is not logged so it returns the search
+    // if the user logs in
+    if (!res.locals.logged) {
+        req.session.lastSearch = req.query.term;
+    }
+    else {
+        req.session.lastSearch = "";
+    }
 
     // Retrieve data to send back to client
-    var dataPromise = new Promise(function(resolve, reject) {
+    new Promise(function(resolve, reject) {
         // Get bars in the area with Yelp
         getYelpLocations(req.query.term, function(err, res) {
             if (err) reject(err);
@@ -28,15 +34,13 @@ exports.getSearchInfo = function(req, res) {
     }).then(function(response) {
         return new Promise(function(resolve, reject) {
                 // Retrieves the locations that the user is going to
-                compareUserLocationsAndResults(response, true, "makwrt", function(err, res) {
+                compareUserLocationsAndResults(response, res.locals.logged,
+                    res.locals.user, function(err, res) {
                     if (err) reject(err);
                     else resolve(res);
                 });
         });
     }).then(function(response) {
-        // Add the user to the end of the response
-        response = response.concat({username: "makwrt"});
-
         // Render the page with the response data
         res.writeHead(200, { 'Content-Type': 'text/plain' });
         res.end(JSON.stringify(response));
@@ -74,9 +78,10 @@ function getYelpLocations(searchTerm, cb) {
 function getNumGoing(businesses, cb) {
     var locations = [];
 
-    // Get all the locations to search for db
+    // Get all the locations to search for db and set default going to 0
     businesses.forEach(function(item) {
         locations.push(item.id);
+        item.going = 0;
     });
 
     var query = { "id": { "$in": locations } };
@@ -88,11 +93,8 @@ function getNumGoing(businesses, cb) {
         if (docs.length > 0) {
             docs.forEach(function(currentDoc) {
                 businesses.forEach(function(currentBusiness) {
-                    // Set default going to 0
-                    currentBusiness.going = 0;
-
                     // Check if anyone is going
-                    if (currentBusiness.id == currentDoc.id) {
+                    if (currentBusiness.id === currentDoc.id) {
                         currentBusiness.going = currentDoc.going;
                     }
                 });
@@ -112,12 +114,13 @@ function getNumGoing(businesses, cb) {
 // Compares the user locations to the results and sets a flag if the user is
 // going to a business
 function compareUserLocationsAndResults(businesses, logged, user, cb) {
+    // Add default of false
+    businesses.forEach(function(business) {
+        business.userGoing = false;
+    });
+
     // If the user is not logged in, he's not going to any of the bars
     if (!logged) {
-        businesses.forEach(function(business) {
-            business.userGoing = false;
-        });
-
         cb(null, businesses);
     }
     // Else, we check to see if he is going to any of the bars
@@ -129,12 +132,9 @@ function compareUserLocationsAndResults(businesses, logged, user, cb) {
 
             docs.going_to.forEach(function(location) {
                 businesses.forEach(function(business) {
-                    // Set true if user is going
-                    if (location === business.name) {
+                    // Set true if user is going and move to next location
+                    if (location === business.id) {
                         business.userGoing = true;
-                    }
-                    else {
-                        business.userGoing = false;
                     }
                 });
             });

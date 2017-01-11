@@ -73,8 +73,15 @@ app.use(passport.session());
 // Home page
 app.get('/', middleware.getLoginSession, site.index);
 
+// Initialize search page
+app.get('/initSearch', middleware.getLoginSession, site.initSearch);
+
 // Users destinations
 app.get('/:user/destinations', middleware.getLoginSession, destinations.index);
+
+// Get the users destinations
+app.get('/destinations', middleware.getLoginSession,
+        destinations.getDestinations);
 
 // Login with twitter
 app.get('/auth/twitter', passport.authenticate('twitter'));
@@ -89,6 +96,10 @@ app.post('/search', middleware.getLoginSession, search.getSearchInfo);
 
 // Add a user to a location
 app.post('/add_user', middleware.getLoginSession, addUser.add);
+
+// Delete a destination from a user's list
+app.post('/delete_destination', middleware.getLoginSession,
+         destinations.deleteDestination);
 
 
 var server = app.listen(8000, function() {

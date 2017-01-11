@@ -6,27 +6,52 @@ var Search = React.createClass({
             searchTerm: "",
             display: "none",
             user: "",
+            lastSearch: "",
             results: []
         };
+    },
+
+    // Initialize component once mounted
+    componentDidMount: function() {
+        var self = this;
+
+        axios.get('/initSearch')
+            .then(function(response) {
+                self.setState({
+                    user: response.data.user
+                });
+
+                if (!!response.data.lastSearch) {
+                    self.getSearch(response.data.lastSearch);
+                }
+            })
+            .catch(function(error) {
+                console.log(error);
+                self.setState({
+                    user: ""
+                });
+            });
     },
 
     // submit a search using ajax
     submit: function(event) {
         event.preventDefault();
+        this.getSearch(this.state.searchTerm);
+    },
 
+    // Sends a request to the server to get the locales
+    getSearch: function(searchTerm) {
         var self = this;
 
         this.setState({
             display: "inline-block"
         });
 
-        axios.post('/search/?term=' + this.state.searchTerm, { })
+        axios.post('/search/?term=' + searchTerm, { })
             .then(function(response) {
-                console.log(response);
                 self.setState({
                     display: "none",
-                    results: response.data.slice(0, response.data.length - 1),
-                    user: response.data[response.data.length - 1]
+                    results: response.data
                 });
             })
             .catch(function(error) {
@@ -113,7 +138,9 @@ var ResultContainer = React.createClass({
         return (
             <div>
                 <Going going={this.props.going} user={this.props.user}
-                    userGoing={this.props.userGoing} id={this.props.id} />
+                    userGoing={this.props.userGoing} id={this.props.id}
+                    name={this.props.name} url={this.props.url}
+                    user={this.props.user} />
                 <a href={this.props.url} target="_blank">
                     <Result rating={this.props.rating}
                             name={this.props.name}
@@ -153,19 +180,22 @@ var Going = React.createClass({
         };
     },
 
+    // Change to indicate user can add or has been added to this locale
     goingMouseOver: function(goingStr, event) {
         this.setState({ going: goingStr });
     },
 
+    // Revert back to normal once user mouses out
     goingMouseOut: function(event) {
-        this.setState({ going: this.props.going + " Going" });
+        this.setState({ going: this.state.numGoing + " Going" });
     },
 
+    // Add a user to a locale
     goingOnClick: function(event) {
         var self = this;
 
-        axios.post('/add_user/?id=' + this.props.id + '?name=' +
-                    this.props.name + '?url=' + this.props.url, { })
+        axios.post('/add_user/?id=' + this.props.id + '&name=' +
+                    this.props.name + '&url=' + this.props.url, { })
             .then(function(response) {
                 self.setState({
                     going: Number(self.state.numGoing++) + " Going",
@@ -187,7 +217,7 @@ var Going = React.createClass({
                     <div className="going user-login"
                         onMouseOver={this.goingMouseOver.bind(null, "You\'re Added")}
                         onMouseOut={this.goingMouseOut}>
-                        {this.state.going}
+                        { this.state.going }
                     </div>
                 );
             }
@@ -207,7 +237,7 @@ var Going = React.createClass({
         else {
             return (
                 <div className="going">
-                    {this.state.going}
+                    { this.state.going }
                 </div>
             );
         }

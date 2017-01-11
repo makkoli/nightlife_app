@@ -9,12 +9,16 @@ exports.add = function(req, res) {
 
     // Add to user's list of bars they are going to
     User.update({ "username": "makwrt" },
-                { "$addToSet": { "going_to": barName } });
+                { "$addToSet": { "going_to": barId } }, function(err) {
+                    console.log(err);
+                });
 
     // Upsert the bar into locations and increase number of people going
     Location.update({ "id": barId, "name": barName, "url": barURL },
                     { "$inc": { "going": 1 } },
-                    { upsert: true });
+                    { upsert: true }, function(err) {
+                        console.log(err);
+                    });
 
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end();

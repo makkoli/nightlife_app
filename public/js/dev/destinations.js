@@ -2,65 +2,110 @@
 var Destinations = React.createClass({
     getInitialState: function() {
         return {
-            user: "",
-            userLocations: []
+            userDestinations: []
         };
     },
 
     componentDidMount: function() {
         var self = this;
 
-        axios.get('/get_user_info')
+        axios.get('/destinations')
             .then(function(response) {
-                console.log(response);
                 self.setState({
-                    user: response.data.user,
-                    userLocations: response.data.userLocations
+                    userDestinations: response.data
                 });
             })
             .catch(function(error) {
                 console.log(error);
                 self.setState({
-                    user: "",
-                    userLocations: []
+                    userDestinations: []
                 });
+            });
+    },
+
+    // Deletes a destination in the users list
+    deleteDestination: function(destId) {
+        var self = this;
+
+        axios.post('/delete_destination?destId=' + destId, { })
+            .then(function(response) {
+                var destinations = self.state.userDestinations.filter(function(destination) {
+                    return destination.id !== destId;
+                });
+
+                self.setState({
+                    userDestinations: destinations
+                });
+            })
+            .catch(function(error) {
+                console.log(error);
+                var errorNode = document.createElement('p');
+                errorNode.appendChild(document.createTextNode('Error with request'));
+                document.querySelector("#destinations").appendChild(errorNode);
             });
     },
 
     render: function() {
         return (
-            <DestinationContainer locations={this.state.userLocations} />
+            <DestinationContainer destinations={this.state.userDestinations}
+                deleteDestination={this.deleteDestination} />
         );
     }
 });
 
+// Presentation component for the list of destinations
 var DestinationContainer = React.createClass({
     render: function() {
+        var self = this;
+
         return (
-            <div className="destinations">
-                <div className="header">
-                    Destinations For Tonight
-                </div>
-                <div className="content">
-                    <ul>
-                        {this.props.locations.forEach(function(location) {
-                            console.log(location);
-                            return <li><Destination location={location} /></li>;
-                        })}
-                    </ul>
-                </div>
-            </div>
+            <table className="table destinations">
+                <caption style={{"fontSize": "x-large"}}>
+                    Destinations for Tonight
+                </caption>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th style={{"textAlign": "right"}}>Going</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {this.props.destinations.map(function(destination) {
+                        return <Destination name={destination.name}
+                                going={destination.going}
+                                url={destination.url}
+                                id={destination.id}
+                                deleteDestination={self.props.deleteDestination}
+                                key={destination.name} />;
+                    })}
+                </tbody>
+            </table>
         );
     }
 });
 
+// Presentation component for a single destination
 var Destination = React.createClass({
     render: function() {
-        console.log(this.props.location);
         return (
-            <div>
-                {this.props.location}
-            </div>
+            <tr>
+                <td>
+                    <a href={this.props.url} target="_blank">
+                        {this.props.name}
+                    </a>
+                </td>
+                <td style={{"textAlign": "right"}}>
+                    {this.props.going}
+                </td>
+                <td style={{"textAlign": "right"}}>
+                    <u style={{"cursor": "pointer"}}
+                        onClick={this.props.deleteDestination
+                        .bind(null, this.props.id)}>
+                        Delete
+                    </u>
+                </td>
+            </tr>
         );
     }
 });
