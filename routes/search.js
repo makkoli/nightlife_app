@@ -1,4 +1,4 @@
-var Env = require('../env/env'),
+var //Env = require('../env/env'),
     Yelp = require('yelp'),
     Location = require('../models/location-model'),
     User = require('../models/user-model'),
@@ -53,10 +53,10 @@ exports.getSearchInfo = function(req, res) {
 // Get 20 locations in the area using Yelp
 function getYelpLocations(searchTerm, cb) {
     var yelp = new Yelp({
-        consumer_key: Env.env.yelpConsumerKey,
-        consumer_secret: Env.env.yelpConsumerSecret,
-        token: Env.env.yelpToken,
-        token_secret: Env.env.yelpTokenSecret
+        consumer_key: process.env.YELP_CONSUMER_KEY || Env.env.yelpConsumerKey,
+        consumer_secret: process.env.YELP_CONSUMER_SECRET || Env.env.yelpConsumerSecret,
+        token: process.env.YELP_TOKEN || Env.env.yelpToken,
+        token_secret: process.env.YELP_TOKEN_SECRET || Env.env.yelpTokenSecret
     });
 
     // Query to Yelp API

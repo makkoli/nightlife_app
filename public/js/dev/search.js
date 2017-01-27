@@ -15,6 +15,7 @@ var Search = React.createClass({
     componentDidMount: function() {
         var self = this;
 
+        // Get last search if user just logged in
         axios.get('/initSearch')
             .then(function(response) {
                 self.setState({

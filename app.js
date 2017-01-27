@@ -6,7 +6,7 @@ var express = require('express'),
     TwitterStrategy = require('passport-twitter').Strategy,
     mongoose = require('mongoose'),
     User = require('./models/user-model'),
-    Env = require('./env/env'),
+    //Env = require('./env/env'),
     site = require('./routes/site'),
     search = require('./routes/search'),
     destinations = require('./routes/destinations'),
@@ -14,7 +14,8 @@ var express = require('express'),
     middleware = require('./middleware'),
     app = express();
 
-var dbConnStr = 'mongodb://localhost:27017/nightlife';
+var dbConnStr = process.env.MONGOLAB_URI || 'mongodb://localhost:27017/nightlife';
+var port = process.env.PORT || 8000;
 // Connect mongoose to db
 mongoose.connect(dbConnStr, function(err) {
     if (err) throw err;
@@ -45,8 +46,8 @@ app.use(require('express-session')({
 }));
 
 passport.use(new TwitterStrategy({
-    consumerKey: Env.env.twitterConsumerKey,
-    consumerSecret: Env.env.twitterConsumerSecret,
+    consumerKey: process.env.TWITTER_CONSUMER_KEY || Env.env.twitterConsumerKey,
+    consumerSecret: process.env.TWITTER_CONSUMER_SECRET || Env.env.twitterConsumerSecret,
     callbackURL: "http://localhost:8000/auth/twitter/callback"
     },
     function(token, tokenSecret, profile, done) {
@@ -102,7 +103,7 @@ app.post('/delete_destination', middleware.getLoginSession,
          destinations.deleteDestination);
 
 
-var server = app.listen(8000, function() {
+var server = app.listen(port, function() {
     var port = server.address().port;
     console.log('Express server listening on port %s.', port);
 });

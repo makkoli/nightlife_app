@@ -6,7 +6,7 @@ exports.index = function(req, res) {
     });
 };
 
-// Initialize the search page with user
+// Initialize the search page with user's last search if user just logged in
 exports.initSearch = function(req, res) {
     var initData = {
         user: res.locals.user,
