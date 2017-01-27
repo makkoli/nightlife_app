@@ -48,7 +48,7 @@ app.use(require('express-session')({
 passport.use(new TwitterStrategy({
     consumerKey: process.env.TWITTER_CONSUMER_KEY || Env.env.twitterConsumerKey,
     consumerSecret: process.env.TWITTER_CONSUMER_SECRET || Env.env.twitterConsumerSecret,
-    callbackURL: "http://localhost:8000/auth/twitter/callback"
+    callbackURL: "https://nightlife-coord.herokuapp.com/auth/twitter/callback"
     },
     function(token, tokenSecret, profile, done) {
         User.findOrCreate({ twitterId: profile.id, username: profile.username }, function(err, user) {
