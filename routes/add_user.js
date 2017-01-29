@@ -8,7 +8,7 @@ exports.add = function(req, res) {
     var barURL = req.query.url;
 
     // Add to user's list of bars they are going to
-    User.update({ "username": "makwrt" },
+    User.update({ "username": res.locals.user },
                 { "$addToSet": { "going_to": barId } }, function(err) {
                     console.log(err);
                 });
